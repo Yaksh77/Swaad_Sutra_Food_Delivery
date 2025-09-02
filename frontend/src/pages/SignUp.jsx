@@ -3,6 +3,8 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import GoogleIcon from "@mui/icons-material/Google";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { SERVER_API } from "../../api";
 
 function SignUp() {
   const primaryColor = "#43A047";
@@ -12,7 +14,34 @@ function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState("user");
   const navigate = useNavigate();
+  const [fullname, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [mobile, setMobile] = useState("");
 
+  const handleSignUp = async () => {
+    try {
+      const result = await axios.post(
+        `${SERVER_API}/auth/signUp`,
+        {
+          fullname,
+          email,
+          password,
+          mobile,
+          role,
+        },
+        { withCredentials: true }
+      );
+      console.log(result);
+      setFullName("");
+      setEmail("");
+      setPassword("");
+      setMobile("");
+      setRole("user");
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
   return (
     <div
       className="min-h-screen flex items-center w-full justify-center p-4"
@@ -47,6 +76,8 @@ function SignUp() {
               border: `1px solid ${borderColor}`,
               color: `${primaryColor}`,
             }}
+            onChange={(e) => setFullName(e.target.value)}
+            value={fullname}
           />
         </div>
         {/* email */}
@@ -65,6 +96,8 @@ function SignUp() {
               border: `1px solid ${borderColor}`,
               color: `${primaryColor}`,
             }}
+            onChange={(e) => setEmail(e.target.value)}
+            value={email}
           />
         </div>
 
@@ -84,6 +117,8 @@ function SignUp() {
               border: `1px solid ${borderColor}`,
               color: `${primaryColor}`,
             }}
+            onChange={(e) => setMobile(e.target.value)}
+            value={mobile}
           />
         </div>
 
@@ -104,6 +139,8 @@ function SignUp() {
                 border: `1px solid ${borderColor}`,
                 color: `${primaryColor}`,
               }}
+              onChange={(e) => setPassword(e.target.value)}
+              value={password}
             />
             <button
               className="absolute right-3 cursor-pointer top-1.5 text-green-500"
@@ -125,7 +162,7 @@ function SignUp() {
             Roles
           </label>
           <div className="flex gap-2">
-            {["User", "Owner", "Deliveryboy"].map((r) => (
+            {["user", "owner", "deliveryboy"].map((r) => (
               <button
                 className="flex-1 border rounded-lg px-3 py-2 text-center font-medium transition-colors cursor-pointer"
                 onClick={() => setRole(r)}
@@ -145,6 +182,7 @@ function SignUp() {
         </div>
         <button
           className={`w-full font-semibold mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200  bg-[#43A047] text-white hover:bg-[#2E7D32] cursor-pointer`}
+          onClick={handleSignUp}
         >
           SignUp
         </button>
