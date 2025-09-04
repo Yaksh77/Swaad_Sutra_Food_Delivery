@@ -127,7 +127,7 @@ function SignIn() {
         <p className="text-center mt-2">
           Want to create new Account?{" "}
           <span
-            onClick={() => navigate("/signin")}
+            onClick={() => navigate("/signup")}
             className="text-[#43A047] cursor-pointer"
           >
             Sign Up

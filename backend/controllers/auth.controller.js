@@ -146,3 +146,31 @@ export const resetPassword = async (req, res) => {
     res.status(500).json({ message: "Error occurred while reseting password" });
   }
 };
+
+export const googleAuth = async (req, res) => {
+  try {
+    const { fullname, email, mobile, role } = req.body;
+    let user = await User.findOne({ email });
+    if (!user) {
+      user = await User.create({
+        fullname,
+        email,
+        mobile,
+        role,
+      });
+    }
+    const token = await genToken(user._id);
+
+    res.cookie("token", token, {
+      secure: false,
+      sameSite: "strict",
+      maxAge: 5 * 24 * 60 * 60 * 1000,
+      httpOnly: true,
+    });
+    res.status(201).json({ user });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error occurred while Google Authentication" });
+  }
+};

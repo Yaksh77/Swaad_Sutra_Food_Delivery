@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { FiArrowLeftCircle } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { SERVER_API } from "../../api";
 
 function ForgotPassword() {
   const borderColor = "#A5D6A7";
@@ -8,6 +10,61 @@ function ForgotPassword() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const handleSetOTP = async () => {
+    try {
+      const result = await axios.post(
+        `${SERVER_API}/auth/send-otp`,
+        {
+          email,
+        },
+        { withCredentials: true }
+      );
+      console.log(result);
+      setStep(2);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+  const handleVerifyOTP = async () => {
+    try {
+      const result = await axios.post(
+        `${SERVER_API}/auth/verify-otp`,
+        {
+          email,
+          otp,
+        },
+        { withCredentials: true }
+      );
+      console.log(result);
+      setStep(3);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+  const handleResetPassword = async () => {
+    if (newPassword !== confirmPassword) {
+      return null;
+    }
+    try {
+      const result = await axios.post(
+        `${SERVER_API}/auth/reset-password`,
+        {
+          email,
+          newPassword,
+        },
+        { withCredentials: true }
+      );
+      console.log(result);
+      navigate("/signin");
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
   return (
     <div className="flex w-full items-center justify-center min-h-screen p-4 bg-[#F1F8E9]">
       <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-8">
@@ -45,7 +102,7 @@ function ForgotPassword() {
             </div>
             <button
               className={`w-full font-semibold mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200  bg-[#43A047] text-white hover:bg-[#2E7D32] cursor-pointer`}
-              //   onClick={}
+              onClick={handleSetOTP}
             >
               Send OTP
             </button>
@@ -53,31 +110,80 @@ function ForgotPassword() {
         )}
         {step == 2 && (
           <div>
-            {/* email */}
-            <div className="mb-4 mt-4">
+            {/* OTP */}
+            <div className="mb-6 mt-4">
               <label
                 htmlFor="email"
                 className="block text-gray-700 font-medium mb-1"
               >
-                Email
+                OTP
               </label>
               <input
                 type="email"
                 className="w-full border rounded-xl px-3 py-2 focus:outline-none focus:border-green-700"
-                placeholder="Enter your email"
+                placeholder="Enter OTP"
                 style={{
                   border: `1px solid ${borderColor}`,
                   color: `${primaryColor}`,
                 }}
-                onChange={(e) => setEmail(e.target.value)}
-                value={email}
+                onChange={(e) => setOtp(e.target.value)}
+                value={otp}
               />
             </div>
             <button
               className={`w-full font-semibold mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200  bg-[#43A047] text-white hover:bg-[#2E7D32] cursor-pointer`}
-              //   onClick={}
+              onClick={handleVerifyOTP}
             >
-              Send OTP
+              Verify
+            </button>
+          </div>
+        )}
+        {step == 3 && (
+          <div>
+            {/* New Password */}
+            <div className="mb-6 mt-4">
+              <label
+                htmlFor="newPassword"
+                className="block text-gray-700 font-medium mb-1"
+              >
+                New Password
+              </label>
+              <input
+                type="email"
+                className="w-full border rounded-xl px-3 py-2 focus:outline-none focus:border-green-700"
+                placeholder="Enter New Password"
+                style={{
+                  border: `1px solid ${borderColor}`,
+                  color: `${primaryColor}`,
+                }}
+                onChange={(e) => setNewPassword(e.target.value)}
+                value={newPassword}
+              />
+            </div>
+            <div className="mb-6 mt-4">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-gray-700 font-medium mb-1"
+              >
+                Confirm Password
+              </label>
+              <input
+                type="email"
+                className="w-full border rounded-xl px-3 py-2 focus:outline-none focus:border-green-700"
+                placeholder="Enter Confirm Password"
+                style={{
+                  border: `1px solid ${borderColor}`,
+                  color: `${primaryColor}`,
+                }}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                value={confirmPassword}
+              />
+            </div>
+            <button
+              className={`w-full font-semibold mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200  bg-[#43A047] text-white hover:bg-[#2E7D32] cursor-pointer`}
+              onClick={handleResetPassword}
+            >
+              Reset Password
             </button>
           </div>
         )}

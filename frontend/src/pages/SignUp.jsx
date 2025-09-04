@@ -5,6 +5,8 @@ import GoogleIcon from "@mui/icons-material/Google";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { SERVER_API } from "../../api";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "../../firebase";
 
 function SignUp() {
   const primaryColor = "#43A047";
@@ -38,6 +40,27 @@ function SignUp() {
       setPassword("");
       setMobile("");
       setRole("user");
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const handleGoogleAuth = async () => {
+    try {
+      if (!mobile) {
+        return alert("Please Mobile number is required");
+      }
+      const proivder = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, proivder);
+      console.log(result);
+
+      const response = await axios.post(`${SERVER_API}/auth/google-auth`, {
+        fullname: result.user.displayName,
+        email: result.user.email,
+        mobile,
+        role,
+      });
+      console.log(response.data);
     } catch (error) {
       console.log(error.message);
     }
@@ -188,6 +211,7 @@ function SignUp() {
         </button>
         <button
           className={`w-full font-semibold mt-4 flex items-center justify-center gap-2  rounded-lg px-4 py-2 transition duration-200 border-gray-400 hover:bg-gray-200 cursor-pointer bg-gray-100`}
+          onClick={handleGoogleAuth}
         >
           <GoogleIcon style={{ color: primaryColor }} />
           {"  "}
