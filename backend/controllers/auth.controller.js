@@ -1,6 +1,7 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import genToken from "../utils/token.js";
+import { sendOtpEmail } from "../utils/mail.js";
 
 export const signUp = async (req, res) => {
   try {
@@ -86,5 +87,62 @@ export const signOut = async (req, res) => {
     res.status(200).json({ message: "Logout successfully" });
   } catch (error) {
     res.status(500).json({ message: "Error occurred while signout" });
+  }
+};
+
+export const sendOTP = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "User does not exist" });
+    }
+
+    const OTP = Math.floor(1000 + Math.random() * 9000).toString();
+    user.resetOtp = OTP;
+    user.otpExpires = Date.now() + 5 * 60 * 1000;
+    user.isOtpVerified = false;
+    await user.save();
+
+    await sendOtpEmail(email, OTP);
+    res.status(200).json({ message: "Otp Sent Successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error while generating OTP" });
+  }
+};
+
+export const verifyOTP = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    const user = await User.findOne({ email });
+    if (!user || user.resetOtp != otp || user.otpExpires < Date.now()) {
+      return res.status(400).json({ message: "Invalid/Expired OTP" });
+    }
+
+    user.isOtpVerified = true;
+    user.resetOtp = undefined;
+    user.otpExpires = undefined;
+    await user.save();
+
+    res.status(200).json({ message: "OTP verified Successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error while verifying OTP" });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+    const user = await User.findOne({ email });
+    if (!user || !user.isOtpVerified) {
+      return res.status(400).json({ message: "Otp verification required" });
+    }
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    user.isOtpVerified = false;
+    await user.save();
+    res.status(200).json({ message: "Password reset successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error occurred while reseting password" });
   }
 };
