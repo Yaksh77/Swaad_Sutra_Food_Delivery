@@ -5,6 +5,9 @@ import GoogleIcon from "@mui/icons-material/Google";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { SERVER_API } from "../../api";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "../../firebase";
+import { ClipLoader } from "react-spinners";
 
 function SignIn() {
   const primaryColor = "#43A047";
@@ -15,8 +18,11 @@ function SignIn() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSignIn = async () => {
+    setLoading(true);
     try {
       const result = await axios.post(
         `${SERVER_API}/auth/signIn`,
@@ -26,11 +32,26 @@ function SignIn() {
         },
         { withCredentials: true }
       );
-      console.log(result);
       setEmail("");
       setPassword("");
+      setError("");
+      setLoading(false);
     } catch (error) {
-      console.log(error.message);
+      setError(error?.response?.data?.message);
+      setLoading(false);
+    }
+  };
+  const handleGoogleAuth = async () => {
+    try {
+      const proivder = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, proivder);
+
+      const response = await axios.post(`${SERVER_API}/auth/google-auth`, {
+        email: result.user.email,
+      });
+      setError("");
+    } catch (error) {
+      setError(error?.response?.data?.message);
     }
   };
   return (
@@ -49,7 +70,7 @@ function SignIn() {
           Swaad Sutra
         </h1>
         <p className="text-gray-700 mb-2">
-          Sign in with your account to get started eith delicious food
+          Sign in with your account to get started with delicious food
           deliveries
         </p>
 
@@ -114,15 +135,20 @@ function SignIn() {
         <button
           className={`w-full font-semibold mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200  bg-[#43A047] text-white hover:bg-[#2E7D32] cursor-pointer`}
           onClick={handleSignIn}
+          disabled={loading}
         >
-          SignIn
+          {loading ? <ClipLoader size={20} /> : "Sign In"}
         </button>
+        {error && (
+          <p className="text-red-500 my-[10px] text-center">{`*${error}`}</p>
+        )}
         <button
           className={`w-full font-semibold mt-4 flex items-center justify-center gap-2  rounded-lg px-4 py-2 transition duration-200 border-gray-400 hover:bg-gray-200 cursor-pointer bg-gray-100`}
+          onClick={handleGoogleAuth}
         >
           <GoogleIcon style={{ color: primaryColor }} />
           {"  "}
-          <span>Signup with Google</span>
+          <span>Signin with Google</span>
         </button>
         <p className="text-center mt-2">
           Want to create new Account?{" "}

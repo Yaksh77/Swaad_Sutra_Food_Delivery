@@ -7,6 +7,7 @@ import axios from "axios";
 import { SERVER_API } from "../../api";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "../../firebase";
+import { ClipLoader } from "react-spinners";
 
 function SignUp() {
   const primaryColor = "#43A047";
@@ -20,8 +21,11 @@ function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mobile, setMobile] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLodaing] = useState(false);
 
   const handleSignUp = async () => {
+    setLodaing(true);
     try {
       const result = await axios.post(
         `${SERVER_API}/auth/signUp`,
@@ -34,25 +38,26 @@ function SignUp() {
         },
         { withCredentials: true }
       );
-      console.log(result);
+      setLodaing(false);
       setFullName("");
       setEmail("");
       setPassword("");
       setMobile("");
       setRole("user");
+      setError("");
+      navigate("/signin");
     } catch (error) {
-      console.log(error.message);
+      setError(error?.response?.data?.message);
     }
   };
 
   const handleGoogleAuth = async () => {
     try {
       if (!mobile) {
-        return alert("Please Mobile number is required");
+        return setError("Mobile number is required");
       }
       const proivder = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, proivder);
-      console.log(result);
 
       const response = await axios.post(`${SERVER_API}/auth/google-auth`, {
         fullname: result.user.displayName,
@@ -60,9 +65,10 @@ function SignUp() {
         mobile,
         role,
       });
-      console.log(response.data);
+      setError("");
     } catch (error) {
-      console.log(error.message);
+      setError(error?.response?.data?.message);
+      setLoading(false);
     }
   };
   return (
@@ -207,11 +213,15 @@ function SignUp() {
           className={`w-full font-semibold mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200  bg-[#43A047] text-white hover:bg-[#2E7D32] cursor-pointer`}
           onClick={handleSignUp}
         >
-          SignUp
+          {loading ? <ClipLoader size={30} /> : "Sign Up"}
         </button>
+        {error && (
+          <p className="text-red-500 my-[10px] text-center">{`*${error}`}</p>
+        )}
         <button
           className={`w-full font-semibold mt-4 flex items-center justify-center gap-2  rounded-lg px-4 py-2 transition duration-200 border-gray-400 hover:bg-gray-200 cursor-pointer bg-gray-100`}
           onClick={handleGoogleAuth}
+          disabled={loading}
         >
           <GoogleIcon style={{ color: primaryColor }} />
           {"  "}
