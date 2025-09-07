@@ -116,7 +116,7 @@ function ForgotPassword() {
               className={`w-full font-semibold mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200  bg-[#43A047] text-white hover:bg-[#2E7D32] cursor-pointer`}
               onClick={handleSetOTP}
             >
-              {loading ? <ClipLoader size={30} /> : "Send OTP"}
+              {loading ? <ClipLoader size={30} color="white" /> : "Send OTP"}
             </button>
             <p className="text-red-500 my-[10px] text-center">{`${error}`}</p>
           </div>
@@ -147,7 +147,7 @@ function ForgotPassword() {
               className={`w-full font-semibold mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200  bg-[#43A047] text-white hover:bg-[#2E7D32] cursor-pointer`}
               onClick={handleVerifyOTP}
             >
-              {loading ? <ClipLoader size={30} /> : "Verify OTP"}
+              {loading ? <ClipLoader size={30} color="white" /> : "Verify OTP"}
             </button>
             <p className="text-red-500 my-[10px] text-center">{`${error}`}</p>
           </div>
@@ -197,7 +197,11 @@ function ForgotPassword() {
               className={`w-full font-semibold mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200  bg-[#43A047] text-white hover:bg-[#2E7D32] cursor-pointer`}
               onClick={handleResetPassword}
             >
-              {loading ? <ClipLoader size={30} /> : "Reset Password"}
+              {loading ? (
+                <ClipLoader size={30} color="white" />
+              ) : (
+                "Reset Password"
+              )}
             </button>
             {error && (
               <p className="text-red-500 my-[10px] text-center">{`*${error}`}</p>
