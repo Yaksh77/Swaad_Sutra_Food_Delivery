@@ -52,4 +52,4 @@ const itemSchema = new mongoose.Schema(
   }
 );
 
-export default Item = mongoose.model("Item", itemSchema);
+export const Item = mongoose.model("Item", itemSchema);
