@@ -8,6 +8,8 @@ import { SERVER_API } from "../../api";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "../../firebase";
 import { ClipLoader } from "react-spinners";
+import { useDispatch } from "react-redux";
+import { setUserData } from "../redux/user.slice";
 
 function SignUp() {
   const primaryColor = "#43A047";
@@ -23,6 +25,7 @@ function SignUp() {
   const [mobile, setMobile] = useState("");
   const [error, setError] = useState("");
   const [loading, setLodaing] = useState(false);
+  const dispatch = useDispatch();
 
   const handleSignUp = async () => {
     setLodaing(true);
@@ -38,6 +41,7 @@ function SignUp() {
         },
         { withCredentials: true }
       );
+      dispatch(setUserData(result.data));
       setLodaing(false);
       setFullName("");
       setEmail("");
@@ -59,12 +63,13 @@ function SignUp() {
       const proivder = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, proivder);
 
-      const response = await axios.post(`${SERVER_API}/auth/google-auth`, {
+      const { data } = await axios.post(`${SERVER_API}/auth/google-auth`, {
         fullname: result.user.displayName,
         email: result.user.email,
         mobile,
         role,
       });
+      dispatch(setUserData(data));
       setError("");
     } catch (error) {
       setError(error?.response?.data?.message);
@@ -213,7 +218,7 @@ function SignUp() {
           className={`w-full font-semibold mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200  bg-[#43A047] text-white hover:bg-[#2E7D32] cursor-pointer`}
           onClick={handleSignUp}
         >
-          {loading ? <ClipLoader size={30} /> : "Sign Up"}
+          {loading ? <ClipLoader size={30} color="white" /> : "Sign Up"}
         </button>
         {error && (
           <p className="text-red-500 my-[10px] text-center">{`*${error}`}</p>
