@@ -37,10 +37,10 @@ export const signUp = async (req, res) => {
     const token = await genToken(user._id);
 
     res.cookie("token", token, {
-      secure: false,
-      sameSite: "strict",
-      maxAge: 5 * 24 * 60 * 60 * 1000,
       httpOnly: true,
+      secure: false, // true only in production with HTTPS
+      sameSite: "lax", // or "none" with secure:true for cross-origin
+      maxAge: 5 * 24 * 60 * 60 * 1000,
     });
 
     return res.status(201).json(user);
