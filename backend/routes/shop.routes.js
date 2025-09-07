@@ -1,16 +1,16 @@
 import { Router } from "express";
-import { createEditShop, getMyShop } from "../controllers/shop.controller";
-import isAuth from "../middlewares/isAuth";
-import { upload } from "../middlewares/multer";
+import { createEditShop, getMyShop } from "../controllers/shop.controller.js";
+import isAuth from "../middlewares/isAuth.js";
+import { upload } from "../middlewares/multer.js";
 const shopRouter = Router();
 
 shopRouter.post(
-  "/shop/create-edit-shop",
+  "/create-edit-shop",
   isAuth,
   upload.single("image"),
   createEditShop
 );
 
-shopRouter.get("/shop/get-shop", isAuth, getMyShop);
+shopRouter.get("/get-shop", isAuth, getMyShop);
 
 export default shopRouter;
