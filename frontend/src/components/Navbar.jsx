@@ -12,6 +12,7 @@ import { IoReceiptOutline } from "react-icons/io5";
 
 function Navbar() {
   const { userData, city } = useSelector((state) => state.user);
+  const { shopData } = useSelector((state) => state.owner);
   const [showInfo, setShowInfo] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const dispatch = useDispatch();
@@ -81,13 +82,18 @@ function Navbar() {
 
         {userData.role == "owner" ? (
           <>
-            <button className="hidden md:flex  items-center gap-1 p-2 cursor-pointer rounded-full bg-[#ff4d2d]/10 text-[#43A047]">
-              <CiCirclePlus size={20} />
-              <span>Add Food Item</span>
-            </button>
-            <button className="md:hidden flex  items-center gap-1 p-2 cursor-pointer rounded-full bg-[#ff4d2d]/10 text-[#43A047]">
-              <CiCirclePlus size={20} />
-            </button>
+            {shopData && (
+              <>
+                <button className="hidden md:flex  items-center gap-1 p-2 cursor-pointer rounded-full bg-[#ff4d2d]/10 text-[#43A047]">
+                  <CiCirclePlus size={20} />
+                  <span>Add Food Item</span>
+                </button>
+                <button className="md:hidden flex  items-center gap-1 p-2 cursor-pointer rounded-full bg-[#ff4d2d]/10 text-[#43A047]">
+                  <CiCirclePlus size={20} />
+                </button>
+              </>
+            )}
+
             <div className="hidden md:flex items-center gap-2 cursor-pointer relative px-3 py-1 rounded-lg bg-[#ff4d2d]/10 text-[#43A047] font-medium">
               <IoReceiptOutline size={20} />
               <span>My Orders</span>
