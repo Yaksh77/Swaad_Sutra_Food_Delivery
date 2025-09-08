@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import axios from "axios";
 import { SERVER_API } from "../../api";
 import { useDispatch, useSelector } from "react-redux";
-import { setCity } from "../redux/user.slice";
+import { setAddress, setCity, setState } from "../redux/user.slice";
 
 function useGetCity() {
   const dispatch = useDispatch();
@@ -17,9 +17,15 @@ function useGetCity() {
           import.meta.env.VITE_GEO_API_KEY
         }`
       );
-      //   console.log(response.data.results[0].city);
+      // console.log(response.data);
       let city = response?.data?.results[0]?.city;
+      let state = response?.data?.results[0]?.state;
+      let address =
+        response?.data?.results[0]?.address_line2 ||
+        response?.data?.results[0]?.address_line1;
       dispatch(setCity(city));
+      dispatch(setState(state));
+      dispatch(setAddress(address));
     });
   }, [userData]);
 }
