@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import Home from "./pages/Home";
 import useGetCity from "./hooks/useGetCity";
 import useGetMyShop from "./hooks/useGetMyShop";
+import CreateEditShop from "./pages/CreateEditShop";
 
 function App() {
   useGetCurrentUser();
@@ -32,6 +33,7 @@ function App() {
         path="/"
         element={userData ? <Home /> : <Navigate to={"/signin"} />}
       />
+      <Route path="/create-shop" element={<CreateEditShop />} />
     </Routes>
   );
 }
