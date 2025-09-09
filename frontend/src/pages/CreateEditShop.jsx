@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { FiArrowLeftCircle } from "react-icons/fi";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { FaUtensils } from "react-icons/fa";
+import axios from "axios";
+import { SERVER_API } from "../../api";
+import { setShopData } from "../redux/owner.slice";
 
 function CreateEditShop() {
   const navigate = useNavigate();
@@ -14,7 +17,40 @@ function CreateEditShop() {
   const [address, setAddress] = useState(shopData?.address || currentAddress);
   const [state, setState] = useState(shopData?.state || currentState);
   const [city, setCity] = useState(shopData?.city || currentCity);
+  const [frontendImage, setFrontendImage] = useState(shopData?.image || null);
+  const [backendImage, setBackendImage] = useState(null);
+  const dispatch = useDispatch();
 
+  const handleImage = (e) => {
+    const file = e.target.files[0];
+    setBackendImage(file);
+    setFrontendImage(URL.createObjectURL(file));
+  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("city", city);
+      formData.append("state", state);
+      formData.append("address", address);
+      if (backendImage) {
+        formData.append("image", backendImage);
+      }
+
+      const result = await axios.post(
+        `${SERVER_API}/shop/create-edit-shop`,
+        formData,
+        {
+          withCredentials: true,
+        }
+      );
+      dispatch(setShopData(result.data));
+    } catch (error) {
+      console.log("Error occurred while processing the form data");
+    }
+  };
   return (
     <div className="flex justify-center flex-col items-center p-6 bg-gradient-to-br from-green-50 relative to-white min-h-screen">
       <div className="absolute top-[20px] left-[20px] z-[10] mb-[10px]">
@@ -33,7 +69,7 @@ function CreateEditShop() {
             {shopData ? "Edit Shop" : "Add Shop"}
           </div>
         </div>
-        <form className="space-y-5">
+        <form className="space-y-5" onSubmit={handleSubmit}>
           <div>
             <label
               htmlFor="name"
@@ -60,7 +96,16 @@ function CreateEditShop() {
               type="file"
               accept="image/*"
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              onChange={handleImage}
             />
+            {frontendImage && (
+              <div className="mt-4">
+                <img
+                  src={frontendImage}
+                  className="w-full h-48 object-cover rounded-lg border"
+                />
+              </div>
+            )}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>

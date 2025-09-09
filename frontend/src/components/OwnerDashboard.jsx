@@ -3,6 +3,8 @@ import Navbar from "../components/Navbar";
 import { useSelector } from "react-redux";
 import { FaUtensils } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { CiShop } from "react-icons/ci";
+import { MdOutlineEditNote } from "react-icons/md";
 
 function OwnerDashboard() {
   const { shopData } = useSelector((state) => state.owner);
@@ -31,6 +33,36 @@ function OwnerDashboard() {
           </div>
         </div>
       )}
+      <div className="w-full flex flex-col items-center gap-6 px-4 sm:px-6">
+        <h1 className="text-2xl sm:text-3xl text-gray-900 flex items-center gap-1 mt-4 text-center">
+          <CiShop className="text-[#43A047] w-14 h-14 " />
+          Welcome to {shopData?.name}
+        </h1>
+        <div className="bg-white  shadow-lg rounded-xl overflow-hidden border border-green-100 hover:shadow-2xl transition-all duration-300 w-full max-w-3xl relative">
+          <div
+            className="absolute top-4 right-4 bg-white text-black p-2 rounded-full shadow-md hover:bg-green-600 transition-colors cursor-pointer"
+            onClick={() => navigate("/create-shop")}
+          >
+            <MdOutlineEditNote size={23} />
+          </div>
+          <img
+            src={shopData?.image}
+            alt={shopData?.name}
+            className="w-full h-48 sm:h-64 object-cover"
+          />
+          <div className="p-4 sm:p-6">
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              {shopData?.name}
+            </h1>
+            <p className="text-gray-500 font-semibold">
+              {shopData?.city},{shopData.state}
+            </p>
+            <p className="text-gray-500 mb-2 font-semibold">
+              {shopData?.address}
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
