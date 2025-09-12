@@ -5,6 +5,7 @@ import { FaUtensils } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { CiShop } from "react-icons/ci";
 import { MdOutlineEditNote } from "react-icons/md";
+import OwnerItemCard from "./OwnerItemCard";
 
 function OwnerDashboard() {
   const { shopData } = useSelector((state) => state.owner);
@@ -55,7 +56,7 @@ function OwnerDashboard() {
               {shopData?.name}
             </h1>
             <p className="text-gray-500 font-semibold">
-              {shopData?.city},{shopData.state}
+              {shopData?.city},{shopData?.state}
             </p>
             <p className="text-gray-500 mb-2 font-semibold">
               {shopData?.address}
@@ -63,7 +64,7 @@ function OwnerDashboard() {
           </div>
         </div>
 
-        {shopData.items.length == 0 && (
+        {shopData?.items?.length == 0 && (
           <div className="flex justify-center items-center p-4 sm:p-6">
             <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
               <div className="flex flex-col items-center text-center">
@@ -83,6 +84,14 @@ function OwnerDashboard() {
                 </button>
               </div>
             </div>
+          </div>
+        )}
+
+        {shopData?.items?.length > 0 && (
+          <div className="flex flex-col items-center gap-4 w-full max-w-3xl">
+            {shopData.items.map((item, index) => {
+              return <OwnerItemCard data={item} key={index} />;
+            })}
           </div>
         )}
       </div>

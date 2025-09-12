@@ -9,6 +9,7 @@ import axios from "axios";
 import { setUserData } from "../redux/user.slice";
 import { CiCirclePlus } from "react-icons/ci";
 import { IoReceiptOutline } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
 
 function Navbar() {
   const { userData, currentCity } = useSelector((state) => state.user);
@@ -16,6 +17,7 @@ function Navbar() {
   const [showInfo, setShowInfo] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
@@ -84,11 +86,17 @@ function Navbar() {
           <>
             {shopData && (
               <>
-                <button className="hidden md:flex  items-center gap-1 p-2 cursor-pointer rounded-full bg-[#ff4d2d]/10 text-[#43A047]">
+                <button
+                  onClick={() => navigate("/add-food-item")}
+                  className="hidden md:flex  items-center gap-1 p-2 cursor-pointer rounded-full bg-[#ff4d2d]/10 text-[#43A047]"
+                >
                   <CiCirclePlus size={20} />
                   <span>Add Food Item</span>
                 </button>
-                <button className="md:hidden flex  items-center gap-1 p-2 cursor-pointer rounded-full bg-[#ff4d2d]/10 text-[#43A047]">
+                <button
+                  onClick={() => navigate("/add-food-item")}
+                  className="md:hidden flex  items-center gap-1 p-2 cursor-pointer rounded-full bg-[#ff4d2d]/10 text-[#43A047]"
+                >
                   <CiCirclePlus size={20} />
                 </button>
               </>
@@ -134,9 +142,11 @@ function Navbar() {
             <div className="text-[17px] font-semibold">
               {userData?.fullname}
             </div>
-            <div className="md:hidden text-[#43A047] font-semibold cursor-pointer">
-              My Orders
-            </div>
+            {userData.role === "user" && (
+              <div className="md:hidden text-[#43A047] font-semibold cursor-pointer">
+                My Orders
+              </div>
+            )}
             <div
               className="text-[#43A047] font-semibold cursor-pointer"
               onClick={handleLogout}

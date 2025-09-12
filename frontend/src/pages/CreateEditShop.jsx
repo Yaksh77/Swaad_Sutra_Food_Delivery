@@ -6,6 +6,7 @@ import { FaUtensils } from "react-icons/fa";
 import axios from "axios";
 import { SERVER_API } from "../../api";
 import { setShopData } from "../redux/owner.slice";
+import { ClipLoader } from "react-spinners";
 
 function CreateEditShop() {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ function CreateEditShop() {
   const [city, setCity] = useState(shopData?.city || currentCity);
   const [frontendImage, setFrontendImage] = useState(shopData?.image || null);
   const [backendImage, setBackendImage] = useState(null);
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
   const handleImage = (e) => {
@@ -28,6 +30,7 @@ function CreateEditShop() {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       const formData = new FormData();
@@ -47,6 +50,7 @@ function CreateEditShop() {
         }
       );
       dispatch(setShopData(result.data));
+      setLoading(false);
     } catch (error) {
       console.log("Error occurred while processing the form data");
     }
@@ -155,7 +159,7 @@ function CreateEditShop() {
             />
           </div>
           <button className="w-full text-lg bg-gray-500 text-white px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-green-700 hover-shadow-lg transition-all cursor-pointer">
-            Save
+            {loading ? <ClipLoader size={20} color="white" /> : "Save"}
           </button>
         </form>
       </div>
