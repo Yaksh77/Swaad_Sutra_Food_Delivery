@@ -67,6 +67,7 @@ function AddItem() {
       setPrice(0);
       setFrontendImage(null);
       setLoading(false);
+      navigate("/");
       dispatch(setShopData(result.data));
     } catch (error) {
       console.log("Error occurred while processing the form data");
