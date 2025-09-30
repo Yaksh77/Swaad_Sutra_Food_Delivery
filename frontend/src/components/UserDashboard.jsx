@@ -4,11 +4,16 @@ import { categories } from "../../category";
 import CategoryCard from "./CategoryCard";
 import { CiCircleChevLeft } from "react-icons/ci";
 import { CiCircleChevRight } from "react-icons/ci";
+import { useSelector } from "react-redux";
 
 function UserDashboard() {
   const cateScrollRef = useRef();
+  const shopScrollRef = useRef();
+  const { currentCity, shopsInMyCity } = useSelector((state) => state.user);
   const [showCateLeftButton, setShowCateLeftButton] = useState(false);
   const [showCateRightButton, setShowCateRightButton] = useState(false);
+  const [showShopLeftButton, setShowShopLeftButton] = useState(false);
+  const [showShopRightButton, setShowShopRightButton] = useState(false);
 
   const updatebutton = (ref, setLeftButton, setRightButton) => {
     const element = ref.current;
@@ -17,10 +22,6 @@ function UserDashboard() {
       setRightButton(
         element.clientWidth + element.scrollLeft < element.scrollWidth
       );
-      // console.log("Client Width : ", element.clientWidth);
-      // console.log("Scroll Left : ", Number.parseInt(element.scrollLeft));
-      console.log("Scroll Width : ", element.scrollWidth);
-      console.log(element.clientWidth + Number.parseInt(element.scrollLeft));
     }
   };
   const scrollHandler = (ref, direction) => {
@@ -34,6 +35,16 @@ function UserDashboard() {
 
   useEffect(() => {
     if (cateScrollRef.current) {
+      updatebutton(
+        cateScrollRef,
+        setShowCateLeftButton,
+        setShowCateRightButton
+      );
+      updatebutton(
+        shopScrollRef,
+        setShowShopLeftButton,
+        setShowShopRightButton
+      );
       cateScrollRef.current.addEventListener("scroll", () => {
         updatebutton(
           cateScrollRef,
@@ -41,8 +52,32 @@ function UserDashboard() {
           setShowCateRightButton
         );
       });
+      cateScrollRef.current.addEventListener("scroll", () => {
+        updatebutton(
+          shopScrollRef,
+          setShowShopLeftButton,
+          setShowShopRightButton
+        );
+      });
     }
-  }, []);
+
+    return () => {
+      cateScrollRef.current.removeEventListener("scroll", () => {
+        updatebutton(
+          cateScrollRef,
+          setShowCateLeftButton,
+          setShowCateRightButton
+        );
+      });
+      shopScrollRef.current.removeEventListener("scroll", () => {
+        updatebutton(
+          cateScrollRef,
+          setShowShopLeftButton,
+          setShowShopRightButton
+        );
+      });
+    };
+  }, [categories]);
   return (
     <div className="w-screen min-h-screen flex flex-col gap-5 items-center bg-[#F1F8E9] overflow-y-auto">
       <Navbar />
@@ -53,7 +88,7 @@ function UserDashboard() {
         <div className="w-full relative">
           {showCateLeftButton && (
             <button
-              onClick={() => scrollHandler(cateScrollRef, "left")}
+              onClick={() => scrollHandler(shopScrollRef, "left")}
               className="absolute left-1 top-1/2 text-2xl -translate-y-1/2 bg-green-600 text-white p-2 rounded-full shadow-lg hover:bg-green-800 z-10"
             >
               <CiCircleChevLeft />
@@ -64,10 +99,45 @@ function UserDashboard() {
             ref={cateScrollRef}
           >
             {categories.map((category, index) => (
-              <CategoryCard data={category} key={index} />
+              <CategoryCard
+                name={category.category}
+                image={category.image}
+                key={index}
+              />
             ))}
           </div>
           {showCateRightButton && (
+            <button
+              onClick={() => scrollHandler(shopScrollRef, "right")}
+              className="absolute right-1 top-1/2 -translate-y-1/2 bg-green-600 text-white text-2xl p-2 rounded-full shadow-lg hover:bg-green-800 z-10"
+            >
+              <CiCircleChevRight />
+            </button>
+          )}
+        </div>
+      </div>
+      <div className="w-full max-w-6xl flex flex-col gap-5 items-start p-[10px]">
+        <h1 className="text-gray-800 text-2xl sm:text-3xl">
+          Best shop in {currentCity}
+        </h1>
+        <div className="w-full relative">
+          {showShopLeftButton && (
+            <button
+              onClick={() => scrollHandler(cateScrollRef, "left")}
+              className="absolute left-1 top-1/2 text-2xl -translate-y-1/2 bg-green-600 text-white p-2 rounded-full shadow-lg hover:bg-green-800 z-10"
+            >
+              <CiCircleChevLeft />
+            </button>
+          )}
+          <div
+            className="w-full relative flex overflow-x-auto gap-4 pb-2 scrollbar-thin scrollbar-thumb-[#ff4d2d] scrollbar-track-transparent scroll-smooth"
+            ref={shopScrollRef}
+          >
+            {shopsInMyCity.map((shop, index) => (
+              <CategoryCard name={shop.name} image={shop.image} key={index} />
+            ))}
+          </div>
+          {showShopRightButton && (
             <button
               onClick={() => scrollHandler(cateScrollRef, "right")}
               className="absolute right-1 top-1/2 -translate-y-1/2 bg-green-600 text-white text-2xl p-2 rounded-full shadow-lg hover:bg-green-800 z-10"
@@ -76,6 +146,12 @@ function UserDashboard() {
             </button>
           )}
         </div>
+      </div>
+
+      <div className="w-full max-w-6xl flex flex-col gap-5 items-start p-[10px]">
+        <h1 className="text-gray-800 text-2xl sm:text-3xl">
+          Suggested Food Items
+        </h1>
       </div>
     </div>
   );

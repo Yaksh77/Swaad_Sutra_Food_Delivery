@@ -1,4 +1,4 @@
-import { createSlice, current } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
 const userSlice = createSlice({
   name: "user",
@@ -7,6 +7,7 @@ const userSlice = createSlice({
     currentCity: null,
     currentState: null,
     currentAddress: null,
+    shopsInMyCity: null,
   },
   reducers: {
     setUserData: (state, action) => {
@@ -21,7 +22,11 @@ const userSlice = createSlice({
     setAddress: (state, action) => {
       state.currentAddress = action.payload;
     },
+    setShopsInMyCity: (state, action) => {
+      state.shopsInMyCity = action.payload;
+    },
   },
 });
-export const { setUserData, setCity, setState, setAddress } = userSlice.actions;
+export const { setUserData, setCity, setState, setAddress, setShopsInMyCity } =
+  userSlice.actions;
 export default userSlice.reducer;
