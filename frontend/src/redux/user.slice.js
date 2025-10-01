@@ -4,11 +4,11 @@ const userSlice = createSlice({
   name: "user",
   initialState: {
     userData: null,
-    currentCity: null,
-    currentState: null,
-    currentAddress: null,
-    shopsInMyCity: null,
-    itemsInMyCity: null,
+    currentCity: "",
+    currentState: "",
+    currentAddress: "",
+    shopsInMyCity: [],
+    itemsInMyCity: [],
   },
   reducers: {
     setUserData: (state, action) => {
