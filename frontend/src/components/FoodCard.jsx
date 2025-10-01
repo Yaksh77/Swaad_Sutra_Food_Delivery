@@ -6,9 +6,13 @@ import { TiStarOutline } from "react-icons/ti";
 import { FaMinus } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa";
 import { FaCartPlus } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart } from "../redux/user.slice";
 
 function FoodCard({ data }) {
   const [quantity, setQuantity] = useState(0);
+  const dispatch = useDispatch();
+  const { cartItems } = useSelector((state) => state.user);
   const renderStars = (rating) => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
@@ -73,7 +77,28 @@ function FoodCard({ data }) {
           >
             <FaPlus size={12} />
           </button>
-          <button className="bg-green-600 text-white px-3 py-2 transition-colors cursor-pointer">
+          <button
+            onClick={() => {
+              if (quantity > 0) {
+                dispatch(
+                  addToCart({
+                    id: data._id,
+                    name: data.name,
+                    price: data.price * quantity,
+                    image: data.image,
+                    shop: data.shop,
+                    quantity,
+                    foodType: data.foodType,
+                  })
+                );
+              }
+            }}
+            className={`${
+              cartItems.some((i) => i.id == data._id)
+                ? `bg-gray-700`
+                : `bg-green-600`
+            } text-white px-3 py-2 transition-colors cursor-pointer`}
+          >
             <FaCartPlus size={12} />
           </button>
         </div>

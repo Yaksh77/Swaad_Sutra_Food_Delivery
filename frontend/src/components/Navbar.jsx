@@ -12,7 +12,9 @@ import { IoReceiptOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 
 function Navbar() {
-  const { userData, currentCity } = useSelector((state) => state.user);
+  const { userData, currentCity, cartItems } = useSelector(
+    (state) => state.user
+  );
   const { shopData } = useSelector((state) => state.owner);
   const [showInfo, setShowInfo] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
@@ -121,7 +123,7 @@ function Navbar() {
             <div className="relative cursor-pointer">
               <FaShoppingCart size={25} className="text-[#43A047]" />
               <span className="absolute right-[-9px] top-[-12px] text-[#43A047]">
-                0
+                {cartItems.length}
               </span>
             </div>
 
