@@ -5,11 +5,14 @@ import CategoryCard from "./CategoryCard";
 import { CiCircleChevLeft } from "react-icons/ci";
 import { CiCircleChevRight } from "react-icons/ci";
 import { useSelector } from "react-redux";
+import FoodCard from "./FoodCard";
 
 function UserDashboard() {
   const cateScrollRef = useRef();
   const shopScrollRef = useRef();
-  const { currentCity, shopsInMyCity } = useSelector((state) => state.user);
+  const { currentCity, shopsInMyCity, itemsInMyCity } = useSelector(
+    (state) => state.user
+  );
   const [showCateLeftButton, setShowCateLeftButton] = useState(false);
   const [showCateRightButton, setShowCateRightButton] = useState(false);
   const [showShopLeftButton, setShowShopLeftButton] = useState(false);
@@ -40,11 +43,6 @@ function UserDashboard() {
         setShowCateLeftButton,
         setShowCateRightButton
       );
-      updatebutton(
-        shopScrollRef,
-        setShowShopLeftButton,
-        setShowShopRightButton
-      );
       cateScrollRef.current.addEventListener("scroll", () => {
         updatebutton(
           cateScrollRef,
@@ -52,7 +50,15 @@ function UserDashboard() {
           setShowCateRightButton
         );
       });
-      cateScrollRef.current.addEventListener("scroll", () => {
+    }
+
+    if (shopScrollRef.current) {
+      updatebutton(
+        shopScrollRef,
+        setShowShopLeftButton,
+        setShowShopRightButton
+      );
+      shopScrollRef.current.addEventListener("scroll", () => {
         updatebutton(
           shopScrollRef,
           setShowShopLeftButton,
@@ -62,22 +68,23 @@ function UserDashboard() {
     }
 
     return () => {
-      cateScrollRef.current.removeEventListener("scroll", () => {
+      cateScrollRef.current?.removeEventListener("scroll", () => {
         updatebutton(
           cateScrollRef,
           setShowCateLeftButton,
           setShowCateRightButton
         );
       });
-      shopScrollRef.current.removeEventListener("scroll", () => {
+      shopScrollRef.current?.removeEventListener("scroll", () => {
         updatebutton(
-          cateScrollRef,
+          shopScrollRef,
           setShowShopLeftButton,
           setShowShopRightButton
         );
       });
     };
-  }, [categories]);
+  }, []);
+
   return (
     <div className="w-screen min-h-screen flex flex-col gap-5 items-center bg-[#F1F8E9] overflow-y-auto">
       <Navbar />
@@ -88,7 +95,7 @@ function UserDashboard() {
         <div className="w-full relative">
           {showCateLeftButton && (
             <button
-              onClick={() => scrollHandler(shopScrollRef, "left")}
+              onClick={() => scrollHandler(cateScrollRef, "left")}
               className="absolute left-1 top-1/2 text-2xl -translate-y-1/2 bg-green-600 text-white p-2 rounded-full shadow-lg hover:bg-green-800 z-10"
             >
               <CiCircleChevLeft />
@@ -108,7 +115,7 @@ function UserDashboard() {
           </div>
           {showCateRightButton && (
             <button
-              onClick={() => scrollHandler(shopScrollRef, "right")}
+              onClick={() => scrollHandler(cateScrollRef, "right")}
               className="absolute right-1 top-1/2 -translate-y-1/2 bg-green-600 text-white text-2xl p-2 rounded-full shadow-lg hover:bg-green-800 z-10"
             >
               <CiCircleChevRight />
@@ -123,7 +130,7 @@ function UserDashboard() {
         <div className="w-full relative">
           {showShopLeftButton && (
             <button
-              onClick={() => scrollHandler(cateScrollRef, "left")}
+              onClick={() => scrollHandler(shopScrollRef, "left")}
               className="absolute left-1 top-1/2 text-2xl -translate-y-1/2 bg-green-600 text-white p-2 rounded-full shadow-lg hover:bg-green-800 z-10"
             >
               <CiCircleChevLeft />
@@ -139,7 +146,7 @@ function UserDashboard() {
           </div>
           {showShopRightButton && (
             <button
-              onClick={() => scrollHandler(cateScrollRef, "right")}
+              onClick={() => scrollHandler(shopScrollRef, "right")}
               className="absolute right-1 top-1/2 -translate-y-1/2 bg-green-600 text-white text-2xl p-2 rounded-full shadow-lg hover:bg-green-800 z-10"
             >
               <CiCircleChevRight />
@@ -152,6 +159,11 @@ function UserDashboard() {
         <h1 className="text-gray-800 text-2xl sm:text-3xl">
           Suggested Food Items
         </h1>
+        <div className="w-full h-auto flex flex-wrap gap-[20px] justify-center">
+          {itemsInMyCity.map((item, index) => (
+            <FoodCard key={index} data={item} />
+          ))}
+        </div>
       </div>
     </div>
   );
