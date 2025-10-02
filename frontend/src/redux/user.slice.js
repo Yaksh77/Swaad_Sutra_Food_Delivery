@@ -38,7 +38,6 @@ const userSlice = createSlice({
       );
       if (existingItem) {
         existingItem.quantity += cartItem.quantity;
-        existingItem.price += cartItem.price;
       } else {
         state.cartItems.push(cartItem);
       }

@@ -84,7 +84,7 @@ function FoodCard({ data }) {
                   addToCart({
                     id: data._id,
                     name: data.name,
-                    price: data.price * quantity,
+                    price: data.price,
                     image: data.image,
                     shop: data.shop,
                     quantity,

@@ -120,7 +120,10 @@ function Navbar() {
           </>
         ) : (
           <>
-            <div className="relative cursor-pointer">
+            <div
+              className="relative cursor-pointer"
+              onClick={() => navigate("/cart")}
+            >
               <FaShoppingCart size={25} className="text-[#43A047]" />
               <span className="absolute right-[-9px] top-[-12px] text-[#43A047]">
                 {cartItems.length}
