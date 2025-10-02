@@ -38,7 +38,10 @@ function CartPage() {
               </span>
             </div>
             <div className="mt-4 flex justify-end">
-              <button className="bg-green-600 text-white px-6 py-2 rounded-lg text-lg font-medium hover:bg-green-700 transition cursor-pointer">
+              <button
+                onClick={() => navigate("/checkout")}
+                className="bg-green-600 text-white px-6 py-2 rounded-lg text-lg font-medium hover:bg-green-700 transition cursor-pointer"
+              >
                 Proceed to Checkout
               </button>
             </div>
