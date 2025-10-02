@@ -41,7 +41,16 @@ const userSlice = createSlice({
       } else {
         state.cartItems.push(cartItem);
       }
-      console.log(state.cartItems);
+    },
+    updateQuantity: (state, action) => {
+      const { id, quantity } = action.payload;
+      const item = state.cartItems.find((i) => i.id == id);
+      if (item) {
+        item.quantity = quantity;
+      }
+    },
+    removeCartItem: (state, action) => {
+      state.cartItems = state.cartItems.filter((i) => i.id !== action.payload);
     },
   },
 });
@@ -53,5 +62,7 @@ export const {
   setShopsInMyCity,
   setItemsInMyCity,
   addToCart,
+  updateQuantity,
+  removeCartItem,
 } = userSlice.actions;
 export default userSlice.reducer;

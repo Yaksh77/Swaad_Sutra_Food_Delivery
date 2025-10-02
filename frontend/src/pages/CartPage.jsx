@@ -25,7 +25,7 @@ function CartPage() {
             Your cart is empty
           </p>
         ) : (
-          <div>
+          <div className="space-y-4">
             {cartItems.map((item, index) => (
               <CartItemCard data={item} key={index} />
             ))}
