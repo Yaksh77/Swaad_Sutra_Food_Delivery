@@ -7,7 +7,12 @@ import { useDispatch, useSelector } from "react-redux";
 import "leaflet/dist/leaflet.css";
 import { setDeliveryAddress, setDeliveryLocation } from "../redux/map.slice";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { MdDeliveryDining } from "react-icons/md";
+import { TbDeviceMobileCheck } from "react-icons/tb";
+import { FaRegCreditCard } from "react-icons/fa6";
+import { useNavigate } from "react-router-dom";
+import { SERVER_API } from "../../api";
 
 function RecenterMap({ location }) {
   if (location.lat && location.lon) {
@@ -19,11 +24,17 @@ function RecenterMap({ location }) {
 
 function Checkout() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { deliveryLocation, deliveryAddress } = useSelector(
     (state) => state.map
   );
+  const { cartItems, totalAmount } = useSelector((state) => state.user);
   const [addressInput, setAddressInput] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("cod");
   const geoLocationApiKey = import.meta.env.VITE_GEO_API_KEY;
+
+  const deliveryFee = totalAmount > 500 ? 0 : 40;
+  const amountWithDeliveryFee = totalAmount + deliveryFee;
 
   const onDragEnd = (e) => {
     const lat = e.target._latlng.lat;
@@ -65,18 +76,44 @@ function Checkout() {
       const lat = response.data.features[0].properties.lat;
       const lon = response.data.features[0].properties.lon;
       dispatch(setDeliveryLocation({ lat, lon }));
-      getAddressByLatLon(lat, lon);
     } catch (error) {
       console.log(error.message);
     }
   };
+
+  const handlePlaceOrder = async () => {
+    try {
+      const response = await axios.post(
+        `${SERVER_API}/order/place-order`,
+        {
+          cartItems,
+          paymentMethod,
+          deliveryAddress: {
+            text: addressInput,
+            latitude: deliveryLocation.lat,
+            longitude: deliveryLocation.lon,
+          },
+          totalAmount,
+        },
+        { withCredentials: true }
+      );
+      console.log(response);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  useEffect(() => {
+    setAddressInput(deliveryAddress);
+  }, [deliveryAddress]);
+
   return (
     <div className="min-h-screen bg-[#F1F8E9] flex items-center justify-center p-6">
       <div className="absolute top-[20px] left-[20px] z-[10]">
         <FiArrowLeftCircle
           size={25}
           className="text-[#43A047]"
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/cart")}
         />
       </div>
       <div className="w-full max-w-[900px] bg-white rounded-2xl shadow-2xl p-6 space-y-6">
@@ -134,6 +171,93 @@ function Checkout() {
             </div>
           </div>
         </section>
+
+        <section>
+          <h2 className="text-lg font-semibold mb-3 text-gray-800">
+            Payment Method
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div
+              className={`flex items-center gap-3 rounded-xl border p-4 text-left transition cursor-pointer ${
+                paymentMethod == "cod"
+                  ? `border-green-600 bg-green-50`
+                  : `border-gray-200 hover:border-gray-300`
+              }`}
+              onClick={() => setPaymentMethod("cod")}
+            >
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-green-200">
+                <MdDeliveryDining className="text-green-800 text-xl" />
+              </span>
+              <div>
+                <p className="font-medium text-gray-800">Cash On Delivery</p>
+                <p className="text-xs text-gray-500">
+                  Pay when your food arrives
+                </p>
+              </div>
+            </div>
+
+            <div
+              className={`flex items-center gap-3 rounded-xl border p-4 text-left transition cursor-pointer ${
+                paymentMethod == "online"
+                  ? `border-green-600 bg-green-50`
+                  : `border-gray-200 hover:border-gray-300`
+              }`}
+              onClick={() => setPaymentMethod("online")}
+            >
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-purple-100">
+                <TbDeviceMobileCheck className="text-purple-700 text-lg" />
+              </span>
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+                <FaRegCreditCard className="text-blue-700 text-lg" />
+              </span>
+              <div>
+                <p className="font-medium text-gray-800">
+                  UPI / Credit / Debit Card
+                </p>
+                <p className="text-xs text-gray-500">Pay Securely Online</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-semibold mb-3 text-gray-800">
+            Order Summary
+          </h2>
+          <div className="rounded-xl border bg-gray-50 p-4 space-y-2">
+            {cartItems.map((item, index) => (
+              <div
+                key={index}
+                className="flex justify-between text-sm text-gray-700"
+              >
+                <span>
+                  {item.name} x {item.quantity}
+                </span>
+                <span>₹{item.price * item.quantity}</span>
+              </div>
+            ))}
+            <hr className="border-gray-400 my-2" />
+            <div className="flex justify-between font-medium text-gray-800">
+              <span>Subtotal</span>
+              <span>₹{totalAmount}</span>
+            </div>
+            <div className="flex justify-between font-medium text-gray-700">
+              <span>Delivery Fee</span>
+              <span>{deliveryFee == 0 ? "Free" : deliveryFee}</span>
+            </div>
+            <div className="flex justify-between text-lg text-green-600 font-bold">
+              <span>Total</span>
+              <span>₹{amountWithDeliveryFee}</span>
+            </div>
+          </div>
+        </section>
+
+        <button
+          onClick={handlePlaceOrder}
+          className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-semibold"
+        >
+          {paymentMethod == "cod" ? "Place Order" : "Pay & Place Order"}
+        </button>
       </div>
     </div>
   );
