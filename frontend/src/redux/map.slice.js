@@ -11,9 +11,9 @@ const mapSlice = createSlice({
   },
   reducers: {
     setDeliveryLocation: (state, action) => {
-      const { latitude, longitude } = action.payload;
-      state.deliveryLocation.lat = latitude;
-      state.deliveryLocation.lon = longitude;
+      const { lat, lon } = action.payload;
+      state.deliveryLocation.lat = lat;
+      state.deliveryLocation.lon = lon;
     },
     setDeliveryAddress: (state, action) => {
       state.deliveryAddress = action.payload;

@@ -9,12 +9,12 @@ function useGetCity() {
   const { userData } = useSelector((state) => state.user);
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(async (position) => {
-      const latitude = position.coords.latitude;
-      const longitude = position.coords.longitude;
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
 
-      dispatch(setDeliveryLocation({ latitude, longitude }));
+      dispatch(setDeliveryLocation({ lat, lon }));
       const response = await axios.get(
-        `https://api.geoapify.com/v1/geocode/reverse?lat=${latitude}&lon=${longitude}&format=json&apiKey=${
+        `https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${lon}&format=json&apiKey=${
           import.meta.env.VITE_GEO_API_KEY
         }`
       );
