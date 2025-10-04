@@ -98,6 +98,7 @@ function Checkout() {
         { withCredentials: true }
       );
       console.log(response);
+      navigate("/order-placed");
     } catch (error) {
       console.log(error.message);
     }
