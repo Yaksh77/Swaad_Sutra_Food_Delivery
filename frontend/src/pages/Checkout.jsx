@@ -13,6 +13,7 @@ import { TbDeviceMobileCheck } from "react-icons/tb";
 import { FaRegCreditCard } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import { SERVER_API } from "../../api";
+import { addMyOrder } from "../redux/user.slice";
 
 function RecenterMap({ location }) {
   if (location.lat && location.lon) {
@@ -97,7 +98,7 @@ function Checkout() {
         },
         { withCredentials: true }
       );
-      console.log(response);
+      dispatch(addMyOrder(response.data));
       navigate("/order-placed");
     } catch (error) {
       console.log(error.message);

@@ -1,6 +1,7 @@
 import Order from "../models/order.model.js";
 import { Shop } from "../models/shop.model.js";
 import User from "../models/user.model.js";
+
 export const placeOrder = async (req, res) => {
   try {
     const { cartItems, paymentMethod, deliveryAddress, totalAmount } = req.body;
@@ -60,6 +61,13 @@ export const placeOrder = async (req, res) => {
       shopOrders,
     });
 
+    await newOrder.populate(
+      "shopOrders.shopOrderItems.item",
+      "name image price"
+    );
+
+    await newOrder.populate("shopOrders.shop", "name");
+
     return res.status(201).json(newOrder);
   } catch (error) {
     return res
@@ -98,5 +106,40 @@ export const getMyOrders = async (req, res) => {
     }
   } catch (error) {
     return res.status(500).json({ message: `Get order : ${error}` });
+  }
+};
+
+export const updateOrderStatus = async (req, res) => {
+  try {
+    const { orderId, shopId } = req.params;
+    const { status } = req.body;
+
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    const shopOrder = order.shopOrders.find(
+      (o) => o.shop.toString() === shopId
+    );
+
+    if (!shopOrder) {
+      return res.status(400).json({ message: "Shop order not found" });
+    }
+
+    shopOrder.status = status;
+
+    await order.save();
+
+    return res.status(200).json({
+      message: "Order status updated successfully",
+      shopOrder,
+    });
+  } catch (error) {
+    console.error("Update order error:", error);
+    return res.status(500).json({
+      message: `Error occurred while changing the order status: ${error.message}`,
+    });
   }
 };
