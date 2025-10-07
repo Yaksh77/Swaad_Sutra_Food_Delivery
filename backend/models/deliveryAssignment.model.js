@@ -13,7 +13,7 @@ const deliveryAssignmentSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       required: true,
     },
-    brodcastedTo: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    broadcastedTo: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     assignedTo: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

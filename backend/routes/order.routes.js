@@ -1,6 +1,7 @@
 import { Router } from "express";
 import isAuth from "../middlewares/isAuth.js";
 import {
+  getDeliveryBoyAssignment,
   getMyOrders,
   placeOrder,
   updateOrderStatus,
@@ -15,5 +16,6 @@ orderRouter.post(
   isAuth,
   updateOrderStatus
 );
+orderRouter.get("/get-assignments", isAuth, getDeliveryBoyAssignment);
 
 export default orderRouter;
