@@ -14,7 +14,7 @@ const deliveryAssignmentSchema = new mongoose.Schema(
       required: true,
     },
     brodcastedTo: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    assignTo: {
+    assignedTo: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       default: null,

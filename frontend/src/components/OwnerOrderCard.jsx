@@ -3,9 +3,11 @@ import axios from "axios";
 import { SERVER_API } from "../../api";
 import { useDispatch } from "react-redux";
 import { updateOrderStatus } from "../redux/user.slice";
+import { useState } from "react";
 
 function OwnerOrderCard({ data }) {
   const dispatch = useDispatch();
+  const [availableBoys, setAvailableBoys] = useState([]);
   const handleUpdateStatus = async (orderId, shopId, status) => {
     try {
       const result = await axios.post(
@@ -16,6 +18,8 @@ function OwnerOrderCard({ data }) {
         }
       );
       dispatch(updateOrderStatus({ orderId, shopId, status }));
+      setAvailableBoys(result.data.availableBoys);
+      console.log(result.data);
     } catch (error) {
       console.log(error);
     }
@@ -83,7 +87,20 @@ function OwnerOrderCard({ data }) {
           <option value="out of delivery">Out Of Devlivery</option>
         </select>
       </div>
-
+      {data.shopOrders.status == "out of delivery" && (
+        <div className="mt-3 p-2 border rounded-lg text-sm bg-green-50">
+          <p>Available Devliery Boys</p>
+          {availableBoys.length > 0 ? (
+            availableBoys.map((b, index) => (
+              <div className="text-gray-400">
+                {b.fullname}-{b.mobile}
+              </div>
+            ))
+          ) : (
+            <div>Waiting for delivery boy to accept order</div>
+          )}
+        </div>
+      )}
       <div className="text-right font-bold text-gray-800">
         Total: ₹{data.shopOrders.subTotal}
       </div>
