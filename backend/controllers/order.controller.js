@@ -132,7 +132,7 @@ export const updateOrderStatus = async (req, res) => {
     shopOrder.status = status;
     let deliveryBoysPayload = [];
 
-    if (status == "out of delivery" || !shopOrder.assignment) {
+    if (status == "out of delivery" && !shopOrder.assignment) {
       const { longitude, latitude } = order.deliveryAddress;
       const nearByDeliveryBoys = await User.find({
         role: "Delivery-Boy",
@@ -238,5 +238,55 @@ export const getDeliveryBoyAssignment = async (req, res) => {
     return res.status(200).json(formatted);
   } catch (error) {
     return res.status(500).json({ message: "Get assignment error" });
+  }
+};
+
+export const acceptOrder = async (req, res) => {
+  try {
+    const { assignmentId } = req.params;
+    const assignment = await DeliveryAssignment.findById(assignmentId);
+    if (!assignment) {
+      return res.status(400).json({ message: "Assignment not found" });
+    }
+    if (assignment.status !== "broadcasted") {
+      return res.status(400).json({ message: "Assignment is expired" });
+    }
+
+    const alreadyAssigned = await DeliveryAssignment.findOne({
+      assignedTo: req.userId,
+      status: { $nin: ["broadcasted", "completed"] },
+    });
+
+    if (alreadyAssigned) {
+      return res
+        .status(400)
+        .json({ message: "You already assigned to another order" });
+    }
+
+    assignment.assignedTo = req.userId;
+    assignment.status = "assigned";
+    assignment.acceptedAt = new Date();
+
+    await assignment.save();
+
+    const order = await Order.findById(assignment.order);
+    if (!order) {
+      return res
+        .status(400)
+        .json({ message: "Order not find during assigning order" });
+    }
+
+    let shopOrder = order.shopOrders.id(assignment.shopOrderId);
+    shopOrder.assignedDeliveryBoy = req.userId;
+
+    await order.save();
+
+    return res.status(200).json({
+      message: "Order accepted",
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Error occurred while accepting order", error });
   }
 };

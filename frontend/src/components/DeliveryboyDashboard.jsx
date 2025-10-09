@@ -13,7 +13,23 @@ function DeliveryboyDashboard() {
       const response = await axios.get(`${SERVER_API}/order/get-assignments`, {
         withCredentials: true,
       });
+      // console.log(response.data);
+
       setAvailableAssignments(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const acceptOrder = async (assignmentId) => {
+    try {
+      const response = await axios.get(
+        `${SERVER_API}/order/accept-order/${assignmentId}`,
+        {
+          withCredentials: true,
+        }
+      );
+      console.log(response.data);
     } catch (error) {
       console.log(error);
     }
@@ -57,7 +73,10 @@ function DeliveryboyDashboard() {
                       {a?.items.length} items | {a?.subTotal}
                     </p>
                   </div>
-                  <button className=" bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm cursor-pointer font-semibold">
+                  <button
+                    onClick={() => acceptOrder(a.assignmentId)}
+                    className=" bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm cursor-pointer font-semibold"
+                  >
                     Accept
                   </button>
                 </div>
