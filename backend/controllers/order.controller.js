@@ -391,7 +391,7 @@ export const sendDeliveryOtp = async (req, res) => {
     const order = await Order.findById(orderId).populate("user");
     const shopOrder = order.shopOrders.id(shopOrderId);
 
-    if (order || shopOrder) {
+    if (!order || !shopOrder) {
       return res
         .status(400)
         .json({ message: "Enter valid order or valid order ID" });
@@ -420,7 +420,7 @@ export const verifyDeliveryOtp = async (req, res) => {
     const order = await Order.findById(orderId).populate("user");
     const shopOrder = order.shopOrders.id(shopOrderId);
 
-    if (order || shopOrder) {
+    if (!order || !shopOrder) {
       return res
         .status(400)
         .json({ message: "Enter valid order or valid order ID" });

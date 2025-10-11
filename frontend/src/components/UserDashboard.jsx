@@ -6,10 +6,13 @@ import { CiCircleChevLeft } from "react-icons/ci";
 import { CiCircleChevRight } from "react-icons/ci";
 import { useSelector } from "react-redux";
 import FoodCard from "./FoodCard";
+import { setItemsInMyCity } from "../redux/user.slice";
+import { useNavigate } from "react-router-dom";
 
 function UserDashboard() {
   const cateScrollRef = useRef();
   const shopScrollRef = useRef();
+  const navigate = useNavigate();
   const { currentCity, shopsInMyCity, itemsInMyCity } = useSelector(
     (state) => state.user
   );
@@ -17,6 +20,7 @@ function UserDashboard() {
   const [showCateRightButton, setShowCateRightButton] = useState(false);
   const [showShopLeftButton, setShowShopLeftButton] = useState(false);
   const [showShopRightButton, setShowShopRightButton] = useState(false);
+  const [updatedItemsList, setUpdatedItemsList] = useState([]);
 
   const updatebutton = (ref, setLeftButton, setRightButton) => {
     const element = ref.current;
@@ -35,6 +39,21 @@ function UserDashboard() {
       });
     }
   };
+
+  const handleFilterByCategory = async (category) => {
+    if (category == "All") {
+      setUpdatedItemsList(itemsInMyCity);
+    } else {
+      const filteredList = itemsInMyCity.filter(
+        (item) => item.category === category
+      );
+      setUpdatedItemsList(filteredList);
+    }
+  };
+
+  useEffect(() => {
+    setUpdatedItemsList(itemsInMyCity);
+  }, [itemsInMyCity]);
 
   useEffect(() => {
     if (cateScrollRef.current) {
@@ -110,6 +129,7 @@ function UserDashboard() {
                 name={category.category}
                 image={category.image}
                 key={index}
+                onClick={() => handleFilterByCategory(category.category)}
               />
             ))}
           </div>
@@ -141,7 +161,12 @@ function UserDashboard() {
             ref={shopScrollRef}
           >
             {shopsInMyCity.map((shop, index) => (
-              <CategoryCard name={shop.name} image={shop.image} key={index} />
+              <CategoryCard
+                name={shop.name}
+                image={shop.image}
+                key={index}
+                onClick={() => navigate(`/shop/${shop._id}`)}
+              />
             ))}
           </div>
           {showShopRightButton && (
@@ -160,7 +185,7 @@ function UserDashboard() {
           Suggested Food Items
         </h1>
         <div className="w-full h-auto flex flex-wrap gap-[20px] justify-center">
-          {itemsInMyCity.map((item, index) => (
+          {updatedItemsList.map((item, index) => (
             <FoodCard key={index} data={item} />
           ))}
         </div>

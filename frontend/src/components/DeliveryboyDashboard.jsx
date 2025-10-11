@@ -11,6 +11,7 @@ function DeliveryboyDashboard() {
   const [availableAssignments, setAvailableAssignments] = useState([]);
   const [currentOrder, setCurrentOrder] = useState(null);
   const [showOtpBox, setShowOtpBox] = useState(false);
+  const [otp, setOtp] = useState("");
 
   const getAssignment = async () => {
     try {
@@ -38,9 +39,6 @@ function DeliveryboyDashboard() {
     }
   };
 
-  const handleOtpSend = (e) => {
-    setShowOtpBox(true);
-  };
   const acceptOrder = async (assignmentId) => {
     try {
       const response = await axios.get(
@@ -50,6 +48,43 @@ function DeliveryboyDashboard() {
         }
       );
       await getCurrentOrder();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const sendOTP = async () => {
+    try {
+      const response = await axios.post(
+        `${SERVER_API}/order/send-delivery-otp/`,
+        {
+          orderId: currentOrder._id,
+          shopOrderId: currentOrder.shopOrder._id,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      setShowOtpBox(true);
+
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const verifyOtp = async () => {
+    try {
+      const response = await axios.post(
+        `${SERVER_API}/order/verify-delivery-otp/`,
+        {
+          orderId: currentOrder._id,
+          shopOrderId: currentOrder.shopOrder._id,
+          OTP: otp,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      console.log(response.data);
     } catch (error) {
       console.log(error);
     }
@@ -128,9 +163,9 @@ function DeliveryboyDashboard() {
               </p>
             </div>
             <DeliveryBoyTracking data={currentOrder} />
-            {showOtpBox ? (
+            {!showOtpBox ? (
               <button
-                onClick={handleOtpSend}
+                onClick={sendOTP}
                 className="mt-4 w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-xl shadow-md hover:bg-green-700 active:scale-95 transition-all duration-200"
               >
                 Mark As Delivered
@@ -147,8 +182,13 @@ function DeliveryboyDashboard() {
                   type="text"
                   className="w-full border px-3 py-2 rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="Enter OTP"
+                  onChange={(e) => setOtp(e.target.value)}
+                  value={otp}
                 />
-                <button className="w-full bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition-all">
+                <button
+                  onClick={verifyOtp}
+                  className="w-full bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition-all"
+                >
                   Submit OTP
                 </button>
               </div>
