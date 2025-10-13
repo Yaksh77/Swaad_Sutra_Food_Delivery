@@ -13,9 +13,8 @@ function UserDashboard() {
   const cateScrollRef = useRef();
   const shopScrollRef = useRef();
   const navigate = useNavigate();
-  const { currentCity, shopsInMyCity, itemsInMyCity } = useSelector(
-    (state) => state.user
-  );
+  const { currentCity, shopsInMyCity, itemsInMyCity, searchItems } =
+    useSelector((state) => state.user);
   const [showCateLeftButton, setShowCateLeftButton] = useState(false);
   const [showCateRightButton, setShowCateRightButton] = useState(false);
   const [showShopLeftButton, setShowShopLeftButton] = useState(false);
@@ -107,6 +106,18 @@ function UserDashboard() {
   return (
     <div className="w-screen min-h-screen flex flex-col gap-5 items-center bg-[#F1F8E9] overflow-y-auto">
       <Navbar />
+      {searchItems && searchItems.length > 0 && (
+        <div className="w-full max-w-6xl flex flex-col gap-5 items-start p-5 bg-white shadow-md rounded-2xl mt-4">
+          <h1 className="text-gray-900 text-2xl sm:text-3xl font-semibold border-b border-gray-200 pb-2">
+            Search Results
+          </h1>
+          <div className="w-full h-auto flex flex-wrap gap-6 justify-center">
+            {searchItems.map((item, index) => (
+              <FoodCard data={item} key={index} />
+            ))}
+          </div>
+        </div>
+      )}
       <div className="w-full max-w-6xl flex flex-col gap-5 items-start p-[10px]">
         <h1 className="text-gray-800 text-2xl sm:text-3xl">
           Inspiration for your first order
