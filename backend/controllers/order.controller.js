@@ -3,6 +3,14 @@ import Order from "../models/order.model.js";
 import { Shop } from "../models/shop.model.js";
 import User from "../models/user.model.js";
 import { sendDeliveryOtpMail } from "../utils/mail.js";
+import Razorpay from "razorpay";
+import dotenv from "dotenv";
+dotenv.config();
+
+let instance = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
 
 export const placeOrder = async (req, res) => {
   try {
@@ -55,6 +63,30 @@ export const placeOrder = async (req, res) => {
       })
     );
 
+    if (paymentMethod == "online") {
+      const razorOrder = instance.orders.create({
+        amount: Math.round(totalAmount * 100),
+        currency: "INR",
+        receipt: `receipt_${Date.now()}`,
+      });
+
+      const newOrder = await Order.create({
+        user: req.userId,
+        paymentMethod,
+        deliveryAddress,
+        totalAmount,
+        shopOrders,
+        razorpayOrderId: razorOrder.id,
+        payment: false,
+      });
+
+      return res.status(200).json({
+        razorOrder,
+        orderId: newOrder._id,
+        kayId: process.env.RAZORPAY_KEY_ID,
+      });
+    }
+
     const newOrder = await Order.create({
       user: req.userId,
       paymentMethod,
@@ -75,6 +107,31 @@ export const placeOrder = async (req, res) => {
     return res
       .status(500)
       .json({ message: `Error occurred while placing the order : ${error}` });
+  }
+};
+
+export const verifyPayment = async (req, res) => {
+  try {
+    const { razorpayPaymentId, orderId } = req.body;
+    const payment = await instance.payments.fetch(razorpayPaymentId);
+    if (!payment || payment.status != "captured") {
+      return res.status(400).json({ message: "Payment not captured" });
+    }
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(400).json({ message: "order not found" });
+    }
+
+    order.payment = true;
+    order.razorpayPaymentId = razorpayPaymentId;
+    order.save();
+
+    await order.populate("shopOrders.shopOrderItems.item", "name image price");
+    await order.populate("shopOrders.shop", "name");
+
+    return res.status(200).json(order);
+  } catch (error) {
+    return res.status(500).json({ message: "Verify payment order error" });
   }
 };
 
