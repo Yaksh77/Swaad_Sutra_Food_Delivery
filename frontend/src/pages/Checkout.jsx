@@ -80,6 +80,40 @@ function Checkout() {
     }
   };
 
+  const openRazorpayWindow = (orderId, razorOrder) => {
+    const options = {
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+      ammount: razorOrder.amount,
+      currency: "INR",
+      name: "Swaad Sutra",
+      description: "Food Order Payment",
+      image: "/frontend/src/assets/logo.png",
+      order_id: razorOrder.id,
+      handler: async function (response) {
+        try {
+          const result = await axios.post(
+            `${SERVER_API}/order/verify-payment`,
+            {
+              razorpayPaymentId: response.razorpay_payment_id,
+              orderId,
+            },
+            { withCredentials: true }
+          );
+          dispatch(addMyOrder(result.data));
+          navigate("/order-placed");
+        } catch (error) {
+          console.log(error);
+        }
+      },
+    };
+    const rzp = new window.Razorpay(options);
+    rzp.on("payment.failed", function (response) {
+      console.error("Payment failed:", response.error);
+      alert("Payment failed! Please try again.");
+    });
+    rzp.open();
+  };
+
   const handlePlaceOrder = async () => {
     try {
       const response = await axios.post(
@@ -92,12 +126,19 @@ function Checkout() {
             latitude: deliveryLocation.lat,
             longitude: deliveryLocation.lon,
           },
-          totalAmount,
+          totalAmount: amountWithDeliveryFee,
         },
         { withCredentials: true }
       );
-      dispatch(addMyOrder(response.data));
-      navigate("/order-placed");
+
+      if (paymentMethod == "cod") {
+        dispatch(addMyOrder(response.data));
+        navigate("/order-placed");
+      } else {
+        const orderId = response.data.orderId;
+        const razorOrder = response.data.razorOrder;
+        openRazorpayWindow(orderId, razorOrder);
+      }
     } catch (error) {
       console.log(error.message);
     }
