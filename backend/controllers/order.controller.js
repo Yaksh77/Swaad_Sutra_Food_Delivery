@@ -296,6 +296,20 @@ export const updateOrderStatus = async (req, res) => {
       "shopOrders.assignedDeliveryBoy",
       "fullname email mobile"
     );
+    await order.populate("user", "socketId");
+
+    const io = req.app.get("io");
+    if (io) {
+      const userSocketId = order.user.socketId;
+      if (userSocketId) {
+        io.to(userSocketId).emit("update-status", {
+          orderId: order._id,
+          shopId: updatedShopOrder.shop._id,
+          status: updatedShopOrder.status,
+          userId: order.user._id,
+        });
+      }
+    }
 
     return res.status(200).json({
       shopOrder: updatedShopOrder,
