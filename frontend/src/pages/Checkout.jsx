@@ -87,7 +87,7 @@ function Checkout() {
       currency: "INR",
       name: "Swaad Sutra",
       description: "Food Order Payment",
-      image: "/frontend/src/assets/logo.png",
+      image: "./logo.png",
       order_id: razorOrder.id,
       handler: async function (response) {
         try {
