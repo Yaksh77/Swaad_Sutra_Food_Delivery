@@ -285,6 +285,32 @@ export const updateOrderStatus = async (req, res) => {
         latitude: b.location.coordinates?.[1],
         mobile: b.mobile,
       }));
+
+      await deliveryAssignment.populate("order");
+      await deliveryAssignment.populate("shop");
+
+      const io = req.app.get("io");
+      if (io) {
+        availableBoys.forEach((boy) => {
+          const dbSocketId = boy.socketId;
+          if (dbSocketId) {
+            io.to(dbSocketId).emit("newAssignment", {
+              sendTo: boy._id,
+              assignmentId: deliveryAssignment._id,
+              orderId: deliveryAssignment.order._id,
+              shopName: deliveryAssignment.shop.name,
+              deliveryAddress: deliveryAssignment.order.deliveryAddress,
+              items:
+                deliveryAssignment.order.shopOrders.find((so) =>
+                  so._id.equals(deliveryAssignment.shopOrderId)
+                ).shopOrderItems || [],
+              subTotal: deliveryAssignment.order.shopOrders.find((so) =>
+                so._id.equals(deliveryAssignment.shopOrderId)
+              )?.subTotal,
+            });
+          }
+        });
+      }
     }
 
     const updatedShopOrder = order.shopOrders.find(
