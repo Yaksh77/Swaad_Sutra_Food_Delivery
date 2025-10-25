@@ -12,6 +12,40 @@ function DeliveryboyDashboard() {
   const [currentOrder, setCurrentOrder] = useState(null);
   const [showOtpBox, setShowOtpBox] = useState(false);
   const [otp, setOtp] = useState("");
+  const [deliveryBoyLocation, setDeliveryBoyLocation] = useState(null);
+
+  useEffect(() => {
+    if (!socket || userData.role !== "Delivery-Boy") {
+      return;
+    }
+    let watchId;
+    if (navigator.geolocation) {
+      (watchId = navigator.geolocation.watchPosition((position) => {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+
+        setDeliveryBoyLocation({ lat: latitude, lon: longitude });
+
+        socket.emit("updateLocation", {
+          latitude,
+          longitude,
+          userId: userData._id,
+        });
+      })),
+        (error) => {
+          console.log(error);
+        },
+        {
+          enableHighAccuracy: true,
+        };
+    }
+
+    return () => {
+      if (watchId) {
+        navigator.geolocation.clearWatch(watchId);
+      }
+    };
+  }, [socket, userData]);
 
   const getAssignment = async () => {
     try {
@@ -117,9 +151,11 @@ function DeliveryboyDashboard() {
           </h1>
           <p className="text-green-700">
             <span className="font-semibold">Latitude:</span>
-            {userData.location.coordinates[1].toFixed(7)},{" "}
-            <span className="font-semibold">Longitude:</span>
-            {userData.location.coordinates[0].toFixed(7)}
+            {deliveryBoyLocation?.lat.toFixed(7) ||
+              userData.location.coordinates[1].toFixed(7)}
+            , <span className="font-semibold">Longitude:</span>
+            {deliveryBoyLocation?.lon.toFixed(7) ||
+              userData.location.coordinates[0].toFixed(7)}
           </p>
         </div>
         {!currentOrder && (
@@ -175,7 +211,18 @@ function DeliveryboyDashboard() {
                 {currentOrder?.shopOrder?.subTotal}
               </p>
             </div>
-            <DeliveryBoyTracking data={currentOrder} />
+            <DeliveryBoyTracking
+              data={{
+                deliveryBoyLocation: deliveryBoyLocation || {
+                  lat: userData.location.coordinates[1],
+                  lon: userData.location.coordinates[0],
+                },
+                customerLocation: {
+                  lat: currentOrder.deliveryAddress.latitude,
+                  lon: currentOrder.deliveryAddress.longitude,
+                },
+              }}
+            />
             {!showOtpBox ? (
               <button
                 onClick={sendOTP}

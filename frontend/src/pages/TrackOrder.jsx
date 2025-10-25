@@ -1,15 +1,19 @@
 import axios from "axios";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { SERVER_API } from "../../api";
 import { useEffect } from "react";
 import { useState } from "react";
 import { FiArrowLeftCircle } from "react-icons/fi";
 import DeliveryBoyTracking from "../components/DeliveryBoyTracking";
+import { useSelector } from "react-redux";
 
 function TrackOrder() {
   const [currentOrder, setCurrentOrder] = useState(null);
+  const [liveLocations, setLiveLocations] = useState({});
   const navigate = useNavigate();
   const { orderId } = useParams();
+  const { socket } = useSelector((state) => state.user);
+
   const handleGetOrder = async () => {
     try {
       const response = await axios.get(
@@ -23,8 +27,22 @@ function TrackOrder() {
   };
 
   useEffect(() => {
+    socket.on(
+      "updateDeliveryLocation",
+      ({ deliveryBoyId, latitude, longitude }) => {
+        setLiveLocations((prev) => ({
+          ...prev,
+          [deliveryBoyId]: { lat: latitude, lon: longitude },
+        }));
+      }
+    );
+    console.log(liveLocations);
+  }, []);
+
+  useEffect(() => {
     handleGetOrder();
   }, [orderId]);
+
   return (
     <div className="max-w-4xl mx-auto p-4 flex flex-col gap-6">
       <div className="relative flex items-center gap-4 top-[20px] left-[20px] z-[10] mb-[10px]">
@@ -83,7 +101,9 @@ function TrackOrder() {
                 {" "}
                 <DeliveryBoyTracking
                   data={{
-                    deliveryBoyLocation: {
+                    deliveryBoyLocation: liveLocations[
+                      shopOrder.assignedDeliveryBoy._id
+                    ] || {
                       lat: shopOrder.assignedDeliveryBoy.location
                         .coordinates[1],
                       lon: shopOrder.assignedDeliveryBoy.location
@@ -95,6 +115,7 @@ function TrackOrder() {
                     },
                   }}
                 />
+                {console.log(shopOrder.assignedDeliveryBoy._id)}
               </div>
             )}
         </div>
