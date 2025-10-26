@@ -5,6 +5,15 @@ import axios from "axios";
 import { SERVER_API } from "../../api.js";
 import { useState } from "react";
 import DeliveryBoyTracking from "./DeliveryBoyTracking.jsx";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 function DeliveryboyDashboard() {
   const { userData, socket } = useSelector((state) => state.user);
@@ -13,6 +22,13 @@ function DeliveryboyDashboard() {
   const [showOtpBox, setShowOtpBox] = useState(false);
   const [otp, setOtp] = useState("");
   const [deliveryBoyLocation, setDeliveryBoyLocation] = useState(null);
+  const [todayDeliveries, setTodayDeliveries] = useState([]);
+
+  const ratePerDelivery = 50;
+  const totalEarning = todayDeliveries.reduce(
+    (sum, d) => sum + d.count * ratePerDelivery,
+    0
+  );
 
   useEffect(() => {
     if (!socket || userData.role !== "Delivery-Boy") {
@@ -86,6 +102,7 @@ function DeliveryboyDashboard() {
       console.log(error);
     }
   };
+
   const sendOTP = async () => {
     try {
       const response = await axios.post(
@@ -105,6 +122,7 @@ function DeliveryboyDashboard() {
       console.log(error);
     }
   };
+
   const verifyOtp = async () => {
     try {
       const response = await axios.post(
@@ -118,6 +136,22 @@ function DeliveryboyDashboard() {
           withCredentials: true,
         }
       );
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleTodayDeliveries = async () => {
+    try {
+      const response = await axios.get(
+        `${SERVER_API}/order/get-today-deliveries/`,
+
+        {
+          withCredentials: true,
+        }
+      );
+      setTodayDeliveries(response.data);
       console.log(response.data);
     } catch (error) {
       console.log(error);
@@ -139,6 +173,7 @@ function DeliveryboyDashboard() {
   useEffect(() => {
     getAssignment();
     getCurrentOrder();
+    handleTodayDeliveries();
   }, [userData]);
 
   return (
@@ -158,6 +193,33 @@ function DeliveryboyDashboard() {
               userData.location.coordinates[0].toFixed(7)}
           </p>
         </div>
+
+        <div className="bg-white rounded-2xl shadow-md p-5 w-[90%] mb-6 border border-green-100">
+          <h1 className="text-lg font-bold mb-4 text-green-600">
+            Today Deliveries
+          </h1>
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart data={todayDeliveries}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="hour" tickFormatter={(h) => `${h}:00`} />
+              <YAxis allowDecimals={false} />
+              <Tooltip
+                formatter={(value) => [value, "orders"]}
+                labelFormatter={(label) => `${label}:00`}
+              />
+              <Bar dataKey="count" fill="#43A047" />
+            </BarChart>
+          </ResponsiveContainer>
+          <div className="max-w-sm mx-auto mt-6 p-6 bg-white rounded-2xl shadow-lg text-center">
+            <h1 className="text-xl font-semibold text-gray-800">
+              Today's Earnings:
+            </h1>
+            <span className="text-3xl font-semibold text-green-600">
+              ₹{totalEarning}
+            </span>
+          </div>
+        </div>
+
         {!currentOrder && (
           <div className="bg-white rounded-2xl p-5 shadow-md w-[90%] border border-green-100">
             <h1 className="text-lg font-bold mb-4 flex items-center gap-2">
@@ -184,7 +246,7 @@ function DeliveryboyDashboard() {
                     </div>
                     <button
                       onClick={() => acceptOrder(a.assignmentId)}
-                      className=" bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm cursor-pointer font-semibold"
+                      className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm cursor-pointer font-semibold"
                     >
                       Accept
                     </button>
