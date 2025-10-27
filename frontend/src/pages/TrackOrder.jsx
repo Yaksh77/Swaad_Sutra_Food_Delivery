@@ -36,7 +36,6 @@ function TrackOrder() {
         }));
       }
     );
-    console.log(liveLocations);
   }, []);
 
   useEffect(() => {
@@ -115,7 +114,6 @@ function TrackOrder() {
                     },
                   }}
                 />
-                {console.log(shopOrder.assignedDeliveryBoy._id)}
               </div>
             )}
         </div>

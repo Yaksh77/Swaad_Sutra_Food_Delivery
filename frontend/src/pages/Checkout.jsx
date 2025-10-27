@@ -13,7 +13,7 @@ import { TbDeviceMobileCheck } from "react-icons/tb";
 import { FaRegCreditCard } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import { SERVER_API } from "../../api";
-import { addMyOrder } from "../redux/user.slice";
+import { addMyOrder, setCartItemsAfterCheckout } from "../redux/user.slice";
 
 function RecenterMap({ location }) {
   if (location.lat && location.lon) {
@@ -139,6 +139,7 @@ function Checkout() {
         const razorOrder = response.data.razorOrder;
         openRazorpayWindow(orderId, razorOrder);
       }
+      dispatch(setCartItemsAfterCheckout(null));
     } catch (error) {
       console.log(error.message);
     }
@@ -266,7 +267,7 @@ function Checkout() {
             Order Summary
           </h2>
           <div className="rounded-xl border bg-gray-50 p-4 space-y-2">
-            {cartItems.map((item, index) => (
+            {cartItems?.map((item, index) => (
               <div
                 key={index}
                 className="flex justify-between text-sm text-gray-700"

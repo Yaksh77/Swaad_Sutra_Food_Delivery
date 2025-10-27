@@ -37,15 +37,15 @@ const userSlice = createSlice({
     addToCart: (state, action) => {
       const cartItem = action.payload;
 
-      const existingItem = state.cartItems.find(
+      const existingItem = state.cartItems?.find(
         (item) => item.id == cartItem.id
       );
       if (existingItem) {
         existingItem.quantity += cartItem.quantity;
       } else {
-        state.cartItems.push(cartItem);
+        state.cartItems?.push(cartItem);
       }
-      state.totalAmount = state.cartItems.reduce(
+      state.totalAmount = state.cartItems?.reduce(
         (sum, i) => sum + i.price * i.quantity,
         0
       );
@@ -99,6 +99,9 @@ const userSlice = createSlice({
     setSocket: (state, action) => {
       state.socket = action.payload;
     },
+    setCartItemsAfterCheckout: (state, action) => {
+      state.cartItems = null;
+    },
   },
 });
 export const {
@@ -117,5 +120,6 @@ export const {
   setSearchItems,
   setSocket,
   updateRealtimeOrderStatus,
+  setCartItemsAfterCheckout,
 } = userSlice.actions;
 export default userSlice.reducer;

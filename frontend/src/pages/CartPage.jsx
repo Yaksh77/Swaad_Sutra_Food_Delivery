@@ -1,7 +1,6 @@
 import { FiArrowLeftCircle } from "react-icons/fi";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import FoodCard from "../components/FoodCard";
 import CartItemCard from "../components/CartItemCard";
 
 function CartPage() {
@@ -20,14 +19,14 @@ function CartPage() {
           </div>
           <h1 className="text-2xl font-bold text-start">Your Cart</h1>
         </div>
-        {cartItems.length == 0 ? (
+        {cartItems?.length == 0 ? (
           <p className="text-lg text-gray-600 text-center">
             Your cart is empty
           </p>
-        ) : (
+        ) : cartItems ? (
           <>
             <div className="space-y-4">
-              {cartItems.map((item, index) => (
+              {cartItems?.map((item, index) => (
                 <CartItemCard data={item} key={index} />
               ))}
             </div>
@@ -46,6 +45,10 @@ function CartPage() {
               </button>
             </div>
           </>
+        ) : (
+          <p className="text-lg text-gray-600 text-center">
+            Your cart is empty
+          </p>
         )}
       </div>
     </div>

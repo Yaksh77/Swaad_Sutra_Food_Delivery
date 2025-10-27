@@ -14,6 +14,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useNavigate } from "react-router-dom";
 
 function DeliveryboyDashboard() {
   const { userData, socket } = useSelector((state) => state.user);
@@ -23,6 +24,7 @@ function DeliveryboyDashboard() {
   const [otp, setOtp] = useState("");
   const [deliveryBoyLocation, setDeliveryBoyLocation] = useState(null);
   const [todayDeliveries, setTodayDeliveries] = useState([]);
+  const navigate = useNavigate();
 
   const ratePerDelivery = 50;
   const totalEarning = todayDeliveries.reduce(
@@ -116,8 +118,6 @@ function DeliveryboyDashboard() {
         }
       );
       setShowOtpBox(true);
-
-      console.log(response.data);
     } catch (error) {
       console.log(error);
     }
@@ -136,7 +136,8 @@ function DeliveryboyDashboard() {
           withCredentials: true,
         }
       );
-      console.log(response.data);
+
+      navigate("/order-delivered");
     } catch (error) {
       console.log(error);
     }

@@ -12,7 +12,7 @@ import { IoReceiptOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 
 function Navbar() {
-  const { userData, currentCity, cartItems } = useSelector(
+  const { userData, currentCity, cartItems, myOrders } = useSelector(
     (state) => state.user
   );
   const { shopData } = useSelector((state) => state.owner);
@@ -135,7 +135,7 @@ function Navbar() {
               <IoReceiptOutline size={20} />
               <span>My Orders</span>
               <span className="absolute -right-2 -top-2 text-xs font-bold text-white bg-[#43A047]/70 rounded-full px-[6px] py-[1px]">
-                0
+                {myOrders?.length || 0}
               </span>
             </div>
             <div
@@ -144,7 +144,7 @@ function Navbar() {
             >
               <IoReceiptOutline size={20} />
               <span className="absolute -right-2 -top-2 text-xs font-bold text-white bg-[#43A047]/70 rounded-full px-[6px] py-[1px]">
-                0
+                {myOrders?.length || 0}
               </span>
             </div>
           </>
@@ -157,7 +157,7 @@ function Navbar() {
               >
                 <FaShoppingCart size={25} className="text-[#43A047]" />
                 <span className="absolute right-[-9px] top-[-12px] text-[#43A047]">
-                  {cartItems.length}
+                  {cartItems?.length || 0}
                 </span>
               </div>
             )}

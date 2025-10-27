@@ -23,6 +23,7 @@ import Shop from "./pages/Shop";
 import { useEffect } from "react";
 import { io } from "socket.io-client";
 import { setSocket } from "./redux/user.slice";
+import OrderDelivered from "./pages/OrderDelivered";
 
 function App() {
   useGetCurrentUser();
@@ -103,6 +104,10 @@ function App() {
       <Route
         path="/shop/:shopId"
         element={userData ? <Shop /> : <Navigate to={"/signin"} />}
+      />
+      <Route
+        path="/order-delivered"
+        element={userData ? <OrderDelivered /> : <Navigate to={"/signin"} />}
       />
     </Routes>
   );

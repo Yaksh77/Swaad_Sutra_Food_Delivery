@@ -94,7 +94,7 @@ function FoodCard({ data }) {
               }
             }}
             className={`${
-              cartItems.some((i) => i.id == data._id)
+              cartItems?.some((i) => i.id == data._id)
                 ? `bg-gray-700`
                 : `bg-green-600`
             } text-white px-3 py-2 transition-colors cursor-pointer`}
