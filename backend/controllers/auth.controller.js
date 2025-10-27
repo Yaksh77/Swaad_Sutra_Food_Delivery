@@ -38,9 +38,10 @@ export const signUp = async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false, // true only in production with HTTPS
-      sameSite: "lax", // or "none" with secure:true for cross-origin
-      maxAge: 5 * 24 * 60 * 60 * 1000,
+      secure: false, // ✅ keep false for localhost
+      sameSite: "lax", // ✅ prevents accidental blocking on localhost
+      path: "/", // ✅ cookie valid across all routes
+      maxAge: 5 * 24 * 60 * 60 * 1000, // 5 days
     });
 
     return res.status(201).json(user);
@@ -67,10 +68,11 @@ export const signIn = async (req, res) => {
     const token = await genToken(user._id);
 
     res.cookie("token", token, {
-      secure: false,
-      sameSite: "strict",
-      maxAge: 5 * 24 * 60 * 60 * 1000,
       httpOnly: true,
+      secure: false, // ✅ keep false for localhost
+      sameSite: "lax", // ✅ prevents accidental blocking on localhost
+      path: "/", // ✅ cookie valid across all routes
+      maxAge: 5 * 24 * 60 * 60 * 1000, // 5 days
     });
 
     return res.status(200).json(user);
@@ -162,11 +164,13 @@ export const googleAuth = async (req, res) => {
     const token = await genToken(user._id);
 
     res.cookie("token", token, {
-      secure: false,
-      sameSite: "strict",
-      maxAge: 5 * 24 * 60 * 60 * 1000,
       httpOnly: true,
+      secure: false, // ✅ keep false for localhost
+      sameSite: "lax", // ✅ prevents accidental blocking on localhost
+      path: "/", // ✅ cookie valid across all routes
+      maxAge: 5 * 24 * 60 * 60 * 1000, // 5 days
     });
+
     res.status(201).json({ user });
   } catch (error) {
     res

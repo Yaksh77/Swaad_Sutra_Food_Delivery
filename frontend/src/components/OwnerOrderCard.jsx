@@ -19,7 +19,6 @@ function OwnerOrderCard({ data }) {
       );
       dispatch(updateOrderStatus({ orderId, shopId, status }));
       setAvailableBoys(result.data.availableBoys);
-      console.log(result.data);
     } catch (error) {
       console.log(error);
     }
@@ -103,7 +102,7 @@ function OwnerOrderCard({ data }) {
           ) : (
             <p>Available Devliery Boys</p>
           )}
-          {availableBoys.length > 0 ? (
+          {availableBoys?.length > 0 ? (
             availableBoys.map((b, index) => (
               <div className="text-gray-400">
                 {b.fullname}-{b.mobile}

@@ -341,7 +341,7 @@ export const updateOrderStatus = async (req, res) => {
       shopOrder: updatedShopOrder,
       assignedDeliveryBoy: updatedShopOrder?.assignedDeliveryBoy,
       availableBoys: deliveryBoysPayload,
-      assignment: updatedShopOrder?.assignment._id,
+      assignment: updatedShopOrder?.assignment?._id || null,
     });
   } catch (error) {
     console.error("Update order error:", error);

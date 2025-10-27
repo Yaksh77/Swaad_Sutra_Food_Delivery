@@ -5,20 +5,32 @@ import { SERVER_API } from "../../api";
 
 function useUpdateLocation() {
   const { userData } = useSelector((state) => state.user);
+
   useEffect(() => {
+    if (!userData) return; // wait until logged in
+
     const updateLocation = async (lat, lon) => {
-      const result = await axios.post(
-        `${SERVER_API}/user/update-user-location`,
-        {
-          lat,
-          lon,
-        },
-        { withCredentials: true }
-      );
+      try {
+        await axios.post(
+          `${SERVER_API}/user/update-user-location`,
+          { lat, lon },
+          { withCredentials: true }
+        );
+      } catch (error) {
+        console.error("Failed to update user location:", error.response?.data);
+      }
     };
-    navigator.geolocation.watchPosition((position) => {
-      updateLocation(position.coords.latitude, position.coords.longitude);
-    });
+
+    // Ask permission explicitly
+    const watcher = navigator.geolocation.watchPosition(
+      (position) => {
+        updateLocation(position.coords.latitude, position.coords.longitude);
+      },
+      (error) => console.error("Geolocation error:", error),
+      { enableHighAccuracy: true }
+    );
+
+    return () => navigator.geolocation.clearWatch(watcher);
   }, [userData]);
 }
 

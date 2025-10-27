@@ -8,13 +8,15 @@ function useGetMyOrders() {
   const dispatch = useDispatch();
   const { userData } = useSelector((state) => state.user);
   useEffect(() => {
+    if (!userData) {
+      return;
+    }
     const fetchOrders = async () => {
       try {
         const result = await axios.get(`${SERVER_API}/order/my-orders`, {
           withCredentials: true,
         });
 
-        console.log(result.data);
         dispatch(setMyOrders(result.data));
       } catch (error) {
         console.log(error);
