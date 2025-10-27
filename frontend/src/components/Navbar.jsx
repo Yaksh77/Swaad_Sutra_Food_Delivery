@@ -139,7 +139,7 @@ function Navbar() {
               </span>
             </div>
             <div
-              onClick={() => navigate("my-orders")}
+              onClick={() => navigate("/my-orders")}
               className="md:hidden flex items-center gap-2 cursor-pointer relative px-3 py-1 rounded-lg bg-[#ff4d2d]/10 text-[#43A047] font-medium"
             >
               <IoReceiptOutline size={20} />
@@ -190,7 +190,7 @@ function Navbar() {
             </div>
             {userData.role === "user" && (
               <div
-                onClick={() => navigate("my-orders")}
+                onClick={() => navigate("/my-orders")}
                 className="md:hidden text-[#43A0v47] font-semibold cursor-pointer"
               >
                 My Orders
